@@ -1,0 +1,16 @@
+<%- include('../partials/head') %>
+<div class="narrow">
+  <div class="auth-intro">
+    <h1>Configuración inicial</h1>
+    <p class="muted">Todavía no hay cuentas. La que crees ahora tendrá permisos de administración: podrá gestionar artistas y todas las obras.</p>
+  </div>
+  <form class="panel" method="post" action="/setup" novalidate>
+    <%- include('../partials/csrf') %>
+    <%- include('../partials/field', { name: 'name', label: 'Tu nombre', value: values.name, error: errors.name, attrs: 'autocomplete="name" required' }) %>
+    <%- include('../partials/field', { name: 'email', label: 'Correo', type: 'email', value: values.email, error: errors.email, attrs: 'autocomplete="email" required' }) %>
+    <%- include('../partials/field', { name: 'password', label: 'Contraseña', type: 'password', value: '', error: errors.password, hint: 'Mínimo 10 caracteres. Una frase corta es fácil de recordar y difícil de adivinar.', attrs: 'autocomplete="new-password" required minlength="10"' }) %>
+    <%- include('../partials/field', { name: 'confirm', label: 'Repite la contraseña', type: 'password', value: '', error: errors.confirm, attrs: 'autocomplete="new-password" required' }) %>
+    <button class="button" type="submit">Crear cuenta de administración</button>
+  </form>
+</div>
+<%- include('../partials/foot') %>

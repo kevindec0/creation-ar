@@ -1,0 +1,3 @@
+Este archivo es un empaquetado para navegador de @vercel/blob/client (versión 2.8.1),
+de Vercel Inc., distribuido bajo licencia Apache-2.0: https://www.apache.org/licenses/LICENSE-2.0
+Se regenera con: npm run vendor:blob

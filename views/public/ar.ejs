@@ -1,0 +1,124 @@
+<%
+  const overlay = assets.find(a => a.role === 'overlay');
+  const hasExtras = assets.some(a => a.role === 'extra') || work.description;
+  const ratio = work.targetHeight / work.targetWidth;
+  const arData = {
+    token: work.shareToken,
+    ratio,
+    overlay: overlay ? { kind: overlay.kind } : null,
+    publicUrl: `/v/${work.shareToken}`,
+  };
+  const json = JSON.stringify(arData).replace(/</g, '\\u003c');
+%>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <title><%= work.title %> en realidad aumentada · CreationAR</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/app.css">
+  <link rel="stylesheet" href="/static/css/ar.css">
+  <script id="ar-data" type="application/json"><%- json %></script>
+  <script src="/static/vendor/aframe/aframe.min.js"></script>
+  <script src="/static/vendor/mind-ar/mindar-image-aframe.prod.js"></script>
+  <script src="/static/js/ar.js"></script>
+</head>
+<body class="ar-body">
+  <!-- Pantalla inicial: la cámara se enciende solo cuando la persona lo pide -->
+  <section id="ar-start" class="ar-screen" aria-labelledby="ar-title">
+    <div class="ar-card">
+      <div class="viewfinder ar-thumb"><img src="<%= media(work.targetImageKey) %>" alt=""></div>
+      <h1 id="ar-title"><%= work.title %></h1>
+      <p class="muted">De <%= artist.name %></p>
+      <p>Al activar la cámara, apunta a la obra. El contenido aparecerá encima cuando la reconozca.</p>
+      <button id="ar-start-btn" class="button large" type="button">Activar cámara</button>
+      <p class="small"><a href="/v/<%= work.shareToken %>">Ver la obra sin cámara</a></p>
+    </div>
+  </section>
+
+  <section id="ar-error" class="ar-screen" hidden role="alert">
+    <div class="ar-card">
+      <h1>No se pudo usar la cámara</h1>
+      <p id="ar-error-text"></p>
+      <div class="actions" style="justify-content:center">
+        <button id="ar-retry" class="button" type="button">Intentar de nuevo</button>
+        <a class="button secondary" href="/v/<%= work.shareToken %>">Ver sin cámara</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="ar-hud" hidden>
+    <div class="ar-topbar">
+      <a class="ar-icon-btn" href="/v/<%= work.shareToken %>" aria-label="Salir de la cámara">✕</a>
+      <span class="ar-topbar-title"><%= work.title %></span>
+      <% if (overlay && overlay.kind === 'video') { %>
+        <button id="ar-sound" class="ar-icon-btn" type="button" aria-pressed="true" aria-label="Silenciar">🔊</button>
+      <% } else { %><span class="ar-icon-spacer"></span><% } %>
+    </div>
+    <div id="ar-hint" class="ar-hint" aria-live="polite">
+      <div class="ar-hint-frame viewfinder" aria-hidden="true"></div>
+      <p id="ar-hint-text">Preparando la cámara…</p>
+    </div>
+    <% if (hasExtras) { %>
+      <button id="ar-more" class="button ar-more" type="button" hidden aria-controls="ar-sheet" aria-expanded="false">Más sobre esta obra</button>
+    <% } %>
+  </div>
+
+  <% if (hasExtras) { %>
+    <section id="ar-sheet" class="ar-sheet" hidden aria-label="Información de la obra">
+      <div class="ar-sheet-head">
+        <div>
+          <h2><%= work.title %></h2>
+          <p class="muted small">De <a href="/a/<%= artist.slug %>"><%= artist.name %></a><%= work.year ? `, ${work.year}` : '' %></p>
+        </div>
+        <button id="ar-sheet-close" class="ar-icon-btn light" type="button" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="ar-sheet-body">
+        <% if (work.description) { %><p style="white-space:pre-line"><%= work.description %></p><% } %>
+        <%- include('../partials/extras') %>
+      </div>
+    </section>
+  <% } %>
+
+  <div id="ar-stage">
+    <a-scene
+      embedded
+      mindar-image="imageTargetSrc: /v/<%= work.shareToken %>/target.mind; autoStart: false; uiLoading: no; uiScanning: no; uiError: no; filterMinCF: 0.0001; filterBeta: 0.001"
+      color-space="sRGB"
+      renderer="colorManagement: true; physicallyCorrectLights: true"
+      vr-mode-ui="enabled: false"
+      xr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+      loading-screen="enabled: false">
+      <a-assets timeout="8000">
+        <% if (overlay?.kind === 'video') { %>
+          <video id="ov-video" src="<%= media(overlay.storageKey) %>" crossorigin="anonymous" playsinline webkit-playsinline loop preload="auto"></video>
+        <% } else if (overlay?.kind === 'image') { %>
+          <img id="ov-image" src="<%= media(overlay.storageKey) %>" crossorigin="anonymous" alt="">
+        <% } else if (overlay?.kind === 'model') { %>
+          <a-asset-item id="ov-model" src="<%= media(overlay.storageKey) %>"></a-asset-item>
+        <% } %>
+      </a-assets>
+
+      <a-camera position="0 0 0" look-controls="enabled: false" cursor="rayOrigin: mouse" raycaster="objects: .clickable"></a-camera>
+      <a-entity light="type: ambient; intensity: 1.2"></a-entity>
+      <a-entity light="type: directional; intensity: 1.5" position="0.5 1 1"></a-entity>
+
+      <a-entity id="ar-target" mindar-image-target="targetIndex: 0">
+        <% if (overlay?.kind === 'video') { %>
+          <a-video id="ov" class="clickable" src="#ov-video" width="1" height="<%= ratio %>" position="0 0 0.01" fit-media></a-video>
+        <% } else if (overlay?.kind === 'image') { %>
+          <a-image id="ov" src="#ov-image" width="1" height="<%= ratio %>" position="0 0 0.01" fit-media></a-image>
+        <% } else if (overlay?.kind === 'model') { %>
+          <a-entity id="ov" gltf-model="#ov-model" fit-model position="0 0 0.15"
+            animation="property: rotation; to: 0 360 0; loop: true; dur: 14000; easing: linear"></a-entity>
+        <% } else { %>
+          <a-plane width="1" height="<%= ratio %>" position="0 0 0.01" material="color: #2633c9; opacity: 0.18; transparent: true"></a-plane>
+        <% } %>
+      </a-entity>
+    </a-scene>
+  </div>
+</body>
+</html>

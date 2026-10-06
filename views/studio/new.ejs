@@ -1,0 +1,21 @@
+<%- include('../partials/head') %>
+<div class="section-head">
+  <h1>Nueva obra</h1>
+  <a href="/studio">Cancelar</a>
+</div>
+<form class="panel" method="post" action="/studio/works" data-compile-form
+      data-quality-low="<%= QUALITY.low %>" data-quality-good="<%= QUALITY.good %>" novalidate>
+  <%- include('../partials/csrf') %>
+  <p class="muted">Primero crearemos el archivo con el que la cámara reconoce tu obra. Se hace aquí mismo en el navegador y tarda entre 10 y 40 segundos. Después podrás añadir videos, audio, imágenes o un modelo 3D.</p>
+  <%- include('../partials/target-picker') %>
+  <%- include('../partials/field', { name: 'title', label: 'Título', value: '', attrs: 'required maxlength="120"' }) %>
+  <div class="row">
+    <%- include('../partials/field', { name: 'technique', label: 'Técnica', value: '', attrs: 'maxlength="120" placeholder="Por ejemplo: óleo sobre lienzo"' }) %>
+    <%- include('../partials/field', { name: 'year', label: 'Año', type: 'number', value: '', attrs: 'inputmode="numeric" min="1000" max="2100"' }) %>
+  </div>
+  <%- include('../partials/field', { name: 'description', label: 'Descripción', type: 'textarea', value: '', hint: 'Se muestra en la página pública y en el panel de la experiencia AR.', attrs: 'maxlength="4000"' }) %>
+  <div class="alert error" data-form-error hidden role="alert"><p></p></div>
+  <button class="button large" type="submit" data-submit>Crear obra</button>
+</form>
+<script type="module" src="/static/js/compile.js"></script>
+<%- include('../partials/foot') %>

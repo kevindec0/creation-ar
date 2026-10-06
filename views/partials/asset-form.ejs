@@ -1,0 +1,37 @@
+<%# Formulario para añadir contenido. Recibe role ('overlay' | 'extra') y kinds (lista). %>
+<% const labels = { image: 'Imagen', video: 'Video', audio: 'Audio', model: 'Modelo 3D', link: 'Enlace' };
+   const accepts = { image: 'image/jpeg,image/png,image/webp', video: 'video/mp4,video/webm', audio: 'audio/mpeg,audio/mp4,audio/ogg,audio/wav,.m4a', model: '.glb,model/gltf-binary' };
+   const fid = 'asset-' + role; %>
+<form method="post" action="/studio/works/<%= work.id %>/assets" data-asset-form novalidate>
+  <%- include('csrf') %>
+  <input type="hidden" name="role" value="<%= role %>">
+  <fieldset>
+    <legend class="label" style="margin-bottom:.5rem">Tipo de contenido</legend>
+    <div class="kind-picker">
+      <% kinds.forEach((k, i) => { %>
+        <label><input type="radio" name="kind" value="<%= k %>" data-accept="<%= accepts[k] || '' %>" <%= i === 0 ? 'checked' : '' %>> <%= labels[k] %></label>
+      <% }) %>
+    </div>
+  </fieldset>
+  <div class="field" data-file-field>
+    <label for="<%= fid %>-file">Archivo</label>
+    <p class="hint">Máximo <%= locals.maxMb %> MB. Videos en MP4 (H.264) para que funcionen en iPhone y Android. Modelos 3D en formato GLB sin compresión Draco.</p>
+    <input id="<%= fid %>-file" type="file" name="file" accept="<%= accepts[kinds[0]] %>">
+  </div>
+  <% if (kinds.includes('link')) { %>
+    <div class="field" data-url-field hidden>
+      <label for="<%= fid %>-url">Dirección del enlace</label>
+      <input id="<%= fid %>-url" type="url" name="url" placeholder="https://">
+    </div>
+  <% } %>
+  <div class="field">
+    <label for="<%= fid %>-title">Texto descriptivo <span class="muted small">(opcional para archivos, obligatorio para enlaces)</span></label>
+    <input id="<%= fid %>-title" type="text" name="title" maxlength="120">
+  </div>
+  <div data-asset-progress hidden aria-live="polite">
+    <div class="progress"><span data-asset-progress-fill></span></div>
+    <p class="small muted" data-asset-progress-text>Subiendo…</p>
+  </div>
+  <div class="alert error" data-asset-error hidden role="alert"><p></p></div>
+  <button class="button secondary" type="submit" data-asset-submit><%= role === 'overlay' ? (locals.hasOverlay ? 'Reemplazar contenido' : 'Subir contenido') : 'Añadir al panel' %></button>
+</form>

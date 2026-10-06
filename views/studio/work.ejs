@@ -1,0 +1,155 @@
+<%- include('../partials/head') %>
+<% const q = qualityLevel(work.featurePoints);
+   const published = work.status === 'published';
+   const maxViews = Math.max(1, ...series.map(d => d.views + d.scans));
+   const labels = { image: 'Imagen', video: 'Video', audio: 'Audio', model: 'Modelo 3D', link: 'Enlace' }; %>
+
+<div class="section-head">
+  <div>
+    <p class="small" style="margin:0 0 .35rem"><a href="/studio">Mis obras</a></p>
+    <h1><%= work.title %> <span class="status <%= work.status %>" style="vertical-align:middle"><%= published ? 'Publicada' : 'Borrador' %></span></h1>
+  </div>
+  <div class="actions">
+    <% if (published) { %>
+      <a class="button secondary" href="/v/<%= work.shareToken %>" target="_blank" rel="noopener">Ver página pública</a>
+      <form method="post" action="/studio/works/<%= work.id %>/unpublish"><%- include('../partials/csrf') %><button class="button secondary" type="submit">Pasar a borrador</button></form>
+    <% } else { %>
+      <form method="post" action="/studio/works/<%= work.id %>/publish"><%- include('../partials/csrf') %><button class="button" type="submit">Publicar</button></form>
+    <% } %>
+  </div>
+</div>
+
+<div class="work-layout">
+  <aside class="work-aside compact">
+    <div class="viewfinder <%= published ? '' : 'is-quiet' %>">
+      <img src="<%= media(work.targetImageKey) %>" alt="Imagen de reconocimiento de la obra" width="<%= work.targetWidth %>" height="<%= work.targetHeight %>">
+    </div>
+    <div class="quality" data-level="<%= q.level %>">
+      <span class="label"><%= q.label %></span>
+      <div class="quality-bar"><span style="width:<%= Math.min(100, Math.round(work.featurePoints / (QUALITY.good * 1.4) * 100)) %>%"></span></div>
+      <p class="small muted"><%= work.featurePoints %> puntos de reconocimiento.
+        <% if (q.level === 'poor') { %>Prueba con una foto más nítida, mejor iluminada o recortada al borde de la obra.<% } %></p>
+    </div>
+    <details>
+      <summary class="link-button">Reemplazar imagen de reconocimiento</summary>
+      <form method="post" action="/studio/works/<%= work.id %>/target" data-compile-form data-replace
+            data-quality-low="<%= QUALITY.low %>" data-quality-good="<%= QUALITY.good %>" style="margin-top:1rem" novalidate>
+        <%- include('../partials/csrf') %>
+        <%- include('../partials/target-picker') %>
+        <div class="alert error" data-form-error hidden role="alert"><p></p></div>
+        <button class="button secondary" type="submit" data-submit>Reemplazar imagen</button>
+      </form>
+    </details>
+  </aside>
+
+  <div>
+    <% if (!overlay && !extras.length) { %>
+      <div class="alert info"><p>Siguiente paso: elige qué aparece sobre la obra al apuntar la cámara, o añade información al panel. Luego publícala para obtener su código QR.</p></div>
+    <% } %>
+
+    <section class="panel" aria-labelledby="compartir">
+      <h2 id="compartir">Compartir</h2>
+      <% if (published) { %>
+        <div class="share">
+          <img src="/v/<%= work.shareToken %>/qr.svg" alt="Código QR que abre la obra">
+          <div>
+            <div class="copy-field">
+              <label class="visually-hidden" for="share-url">Enlace público</label>
+              <input id="share-url" type="text" value="<%= shareUrl %>" readonly>
+              <button class="button secondary" type="button" data-copy="#share-url">Copiar</button>
+            </div>
+            <div class="actions">
+              <a class="button secondary" href="/v/<%= work.shareToken %>/qr.png?download">Descargar QR (PNG)</a>
+              <a href="/v/<%= work.shareToken %>/qr.svg?download">SVG para imprenta</a>
+            </div>
+            <% if (shareUrl.includes('localhost') || shareUrl.includes('127.0.0.1')) { %>
+              <p class="small muted" style="margin-top:.75rem">Este enlace usa <strong>localhost</strong> y no abrirá en otros dispositivos. Para probar desde el celular usa un túnel https y define APP_URL (ver README).</p>
+            <% } %>
+          </div>
+        </div>
+      <% } else { %>
+        <p class="muted">Publica la obra para obtener su enlace y el código QR que pondrás junto a ella.</p>
+      <% } %>
+    </section>
+
+    <section class="panel" id="sobre-la-obra" aria-labelledby="h-overlay">
+      <h2 id="h-overlay">Sobre la obra</h2>
+      <p>Lo que aparece encima de la obra cuando la cámara la reconoce. Puede ser un video, una imagen o un modelo 3D que gira.</p>
+      <% if (overlay) { %>
+        <div class="overlay-preview">
+          <% if (overlay.kind === 'video') { %><video src="<%= media(overlay.storageKey) %>" controls muted playsinline preload="metadata"></video>
+          <% } else if (overlay.kind === 'image') { %><img src="<%= media(overlay.storageKey) %>" alt="">
+          <% } else { %><p class="label">Modelo 3D<% if (overlay.title) { %>: <%= overlay.title %><% } %></p><% } %>
+        </div>
+        <form method="post" action="/studio/works/<%= work.id %>/assets/<%= overlay.id %>/delete" data-confirm="¿Quitar el contenido que aparece sobre la obra?" style="margin-bottom:1.5rem">
+          <%- include('../partials/csrf') %>
+          <button class="link-button" type="submit">Quitar contenido</button>
+        </form>
+      <% } %>
+      <%- include('../partials/asset-form', { role: 'overlay', kinds: ['video', 'image', 'model'], hasOverlay: !!overlay, maxMb: locals.maxMb }) %>
+    </section>
+
+    <section class="panel" id="panel" aria-labelledby="h-panel">
+      <h2 id="h-panel">Panel de información</h2>
+      <p>Contenido adicional que la gente puede abrir durante la experiencia y que también aparece en la página pública: audioguías, más imágenes, videos y enlaces.</p>
+      <% if (extras.length) { %>
+        <ul class="asset-list">
+          <% extras.forEach(a => { %>
+            <li>
+              <% if (a.kind === 'image') { %><img class="asset-thumb" src="<%= media(a.storageKey) %>" alt=""><% } else { %><span class="asset-thumb"><%= labels[a.kind] %></span><% } %>
+              <span class="asset-name"><%= a.title || labels[a.kind] %><% if (a.kind === 'link') { %> <span class="small muted"><%= a.url %></span><% } %></span>
+              <form method="post" action="/studio/works/<%= work.id %>/assets/<%= a.id %>/delete" data-confirm="¿Eliminar este contenido?">
+                <%- include('../partials/csrf') %>
+                <button class="link-button" type="submit">Eliminar</button>
+              </form>
+            </li>
+          <% }) %>
+        </ul>
+      <% } %>
+      <%- include('../partials/asset-form', { role: 'extra', kinds: ['audio', 'image', 'video', 'link'], maxMb: locals.maxMb }) %>
+    </section>
+
+    <section class="panel" aria-labelledby="h-activity">
+      <h2 id="h-activity">Actividad</h2>
+      <div class="totals">
+        <div><strong><%= totals.views %></strong><span>visitas a la página</span></div>
+        <div><strong><%= totals.scans %></strong><span>veces reconocida por la cámara</span></div>
+      </div>
+      <div class="activity" role="img" aria-label="Actividad de los últimos 14 días">
+        <% series.forEach(d => { %>
+          <div class="activity-day" title="<%= d.day %>: <%= d.views %> visitas, <%= d.scans %> escaneos">
+            <span class="scans" style="height:<%= (d.scans / maxViews) * 100 %>%"></span>
+            <span class="views" style="height:<%= (d.views / maxViews) * 100 %>%"></span>
+          </div>
+        <% }) %>
+      </div>
+      <div class="legend"><span><i style="background:var(--line)"></i>Visitas</span><span><i style="background:var(--ultramarine)"></i>Escaneos</span><span>Últimos 14 días</span></div>
+    </section>
+
+    <section class="panel" aria-labelledby="h-info">
+      <h2 id="h-info">Datos de la obra</h2>
+      <form method="post" action="/studio/works/<%= work.id %>" novalidate>
+        <%- include('../partials/csrf') %>
+        <%- include('../partials/field', { name: 'title', label: 'Título', value: values.title, error: errors.title, attrs: 'required maxlength="120"' }) %>
+        <div class="row">
+          <%- include('../partials/field', { name: 'technique', label: 'Técnica', value: values.technique, error: errors.technique, attrs: 'maxlength="120"' }) %>
+          <%- include('../partials/field', { name: 'year', label: 'Año', type: 'number', value: values.year ?? '', error: errors.year, attrs: 'inputmode="numeric"' }) %>
+        </div>
+        <%- include('../partials/field', { name: 'description', label: 'Descripción', type: 'textarea', value: values.description, error: errors.description, attrs: 'maxlength="4000"' }) %>
+        <button class="button" type="submit">Guardar cambios</button>
+      </form>
+    </section>
+
+    <section class="panel danger-zone" aria-labelledby="h-delete">
+      <h2 id="h-delete">Eliminar obra</h2>
+      <p>Se borran la obra, sus archivos y sus estadísticas. Los códigos QR impresos dejarán de funcionar.</p>
+      <form method="post" action="/studio/works/<%= work.id %>/delete" data-confirm="¿Eliminar “<%= work.title %>” para siempre? Esta acción no se puede deshacer.">
+        <%- include('../partials/csrf') %>
+        <button class="button danger" type="submit">Eliminar obra</button>
+      </form>
+    </section>
+  </div>
+</div>
+<script type="module" src="/static/js/compile.js"></script>
+<script type="module" src="/static/js/assets.js"></script>
+<%- include('../partials/foot') %>

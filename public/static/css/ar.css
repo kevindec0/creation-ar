@@ -1,0 +1,227 @@
+/* Experiencia AR a pantalla completa. Se carga después de app.css. */
+
+.ar-body {
+  display: block;
+  margin: 0;
+  min-height: 0;
+  height: 100dvh;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+}
+
+#ar-stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #000;
+}
+#ar-stage a-scene {
+  width: 100%;
+  height: 100%;
+}
+
+.ar-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: var(--wall);
+  color: var(--ink);
+  overflow-y: auto;
+}
+.ar-screen[hidden] {
+  display: none;
+}
+.ar-card {
+  max-width: 26rem;
+  text-align: center;
+}
+.ar-card p {
+  margin-inline: auto;
+}
+.ar-card h1 {
+  font-size: var(--step-3);
+}
+.ar-thumb {
+  width: min(70vw, 15rem);
+  margin: 0 auto 1.5rem;
+}
+.ar-thumb img {
+  height: auto;
+}
+
+/* Capa de controles sobre la cámara */
+#ar-hud[hidden] {
+  display: none;
+}
+.ar-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: calc(env(safe-area-inset-top) + 0.75rem) 0.75rem 0.75rem;
+  background: linear-gradient(rgba(0, 0, 0, 0.55), transparent);
+}
+.ar-topbar-title {
+  flex: 1;
+  text-align: center;
+  font-family: var(--display);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ar-icon-btn,
+.ar-icon-spacer {
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+}
+.ar-icon-btn {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 1.15rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+.ar-icon-btn:hover {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.65);
+}
+.ar-icon-btn.light {
+  background: var(--wall);
+  color: var(--ink);
+}
+.ar-icon-btn.light:hover {
+  background: var(--line);
+  color: var(--ink);
+}
+
+.ar-hint {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1.25rem;
+  pointer-events: none;
+}
+.ar-hint[hidden] {
+  display: none;
+}
+.ar-hint-frame {
+  --vf-color: #fff;
+  --vf-len: 34px;
+  --vf-thick: 4px;
+  width: min(70vw, 20rem);
+  aspect-ratio: 3 / 4;
+  animation: ar-breathe 2.2s ease-in-out infinite;
+}
+.ar-hint p {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  font-weight: 700;
+}
+@keyframes ar-breathe {
+  50% {
+    transform: scale(0.94);
+  }
+}
+
+.ar-more {
+  position: fixed;
+  z-index: 20;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + 1.25rem);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+.ar-more[hidden] {
+  display: none;
+}
+
+/* Panel inferior con la información de la obra */
+.ar-sheet {
+  position: fixed;
+  z-index: 25;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 78dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--wall);
+  color: var(--ink);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.35);
+  animation: ar-sheet-in 220ms ease-out;
+}
+.ar-sheet[hidden] {
+  display: none;
+}
+@keyframes ar-sheet-in {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
+.ar-sheet-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+.ar-sheet-head h2 {
+  margin: 0 0 0.2rem;
+  font-size: var(--step-1);
+}
+.ar-sheet-head p {
+  margin: 0;
+}
+.ar-sheet-body {
+  overflow-y: auto;
+  padding: 1.25rem 1.25rem calc(env(safe-area-inset-bottom) + 1.5rem);
+}
+.ar-sheet-body .panel {
+  padding: 1rem;
+}
+
+@media (min-width: 48rem) {
+  .ar-sheet {
+    left: auto;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    width: 26rem;
+    border-radius: 16px;
+  }
+}
+
+.ar-fallback-video {
+  position: fixed;
+  z-index: 15;
+  left: 1rem;
+  right: 1rem;
+  top: calc(env(safe-area-inset-top) + 4.5rem);
+  max-height: 45dvh;
+  width: calc(100% - 2rem);
+  border-radius: 12px;
+  background: #000;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}

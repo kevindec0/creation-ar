@@ -1,0 +1,51 @@
+<%- include('../partials/head') %>
+<div class="section-head">
+  <h1>Administración</h1>
+  <a href="/admin/works">Ver todas las obras</a>
+</div>
+<section class="panel">
+  <div class="totals">
+    <div><strong><%= people.length %></strong><span>cuentas</span></div>
+    <div><strong><%= workCounts.total %></strong><span>obras</span></div>
+    <div><strong><%= workCounts.published %></strong><span>publicadas</span></div>
+    <div><strong><%= totals.views %></strong><span>visitas</span></div>
+    <div><strong><%= totals.scans %></strong><span>escaneos</span></div>
+  </div>
+</section>
+<section class="panel">
+  <h2>Cuentas</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Obras</th><th>Estado</th><th><span class="visually-hidden">Acciones</span></th></tr></thead>
+      <tbody>
+        <% people.forEach(p => { const self = p.id === user.id; %>
+          <tr>
+            <td><a href="/a/<%= p.slug %>"><%= p.name %></a><% if (self) { %> <span class="muted">(tú)</span><% } %></td>
+            <td><%= p.email %></td>
+            <td>
+              <% if (self) { %>Administración<% } else { %>
+                <form method="post" action="/admin/users/<%= p.id %>/role">
+                  <%- include('../partials/csrf') %>
+                  <input type="hidden" name="role" value="<%= p.role === 'admin' ? 'artist' : 'admin' %>">
+                  <%= p.role === 'admin' ? 'Administración' : 'Artista' %>
+                  <button class="link-button small" type="submit"><%= p.role === 'admin' ? 'Pasar a artista' : 'Hacer admin' %></button>
+                </form>
+              <% } %>
+            </td>
+            <td><%= p.works %></td>
+            <td><span class="status <%= p.active ? 'published' : 'inactive' %>"><%= p.active ? 'Activa' : 'Desactivada' %></span></td>
+            <td>
+              <% if (!self) { %>
+                <form method="post" action="/admin/users/<%= p.id %>/active" data-confirm="<%= p.active ? `¿Desactivar la cuenta de ${p.name}? No podrá entrar y sus obras dejarán de mostrarse.` : '' %>">
+                  <%- include('../partials/csrf') %>
+                  <button class="link-button" type="submit"><%= p.active ? 'Desactivar' : 'Reactivar' %></button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</section>
+<%- include('../partials/foot') %>

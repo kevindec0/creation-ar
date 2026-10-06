@@ -1,0 +1,24 @@
+<%# Selector de imagen + compilación en el navegador. Lo usa compile.js. %>
+<div class="field">
+  <span class="label" id="target-label">Foto de la obra</span>
+  <p class="hint">Tomada de frente, sin reflejos y recortada justo al borde de la obra. JPG, PNG o WebP. Las obras con mucho detalle y contraste se reconocen mejor que las lisas o muy oscuras.</p>
+  <label class="dropzone" data-dropzone>
+    <input type="file" name="targetSource" accept="image/jpeg,image/png,image/webp" aria-labelledby="target-label" data-target-input>
+    <strong>Elige una imagen</strong>
+    <span class="small muted">o arrástrala aquí</span>
+  </label>
+  <p class="error" data-target-error hidden></p>
+</div>
+<div class="target-preview" data-target-preview hidden>
+  <div class="viewfinder"><img alt="Vista previa de la obra" data-target-img></div>
+  <p class="small muted" data-target-dims></p>
+</div>
+<div class="quality" data-quality hidden aria-live="polite">
+  <span class="label" data-quality-label></span>
+  <div class="quality-bar"><span data-quality-fill style="width:0"></span></div>
+  <p class="small muted" data-quality-text></p>
+</div>
+<div data-progress hidden aria-live="polite">
+  <div class="progress"><span data-progress-fill></span></div>
+  <p class="small muted" data-progress-text>Analizando la imagen…</p>
+</div>

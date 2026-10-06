@@ -1,0 +1,25 @@
+<%- include('../partials/head') %>
+<div class="section-head">
+  <h1>Mi perfil</h1>
+  <a href="/a/<%= user.slug %>">Ver mi perfil público</a>
+</div>
+<div class="row" style="align-items:start;gap:1.5rem">
+  <form class="panel" method="post" action="/studio/profile" novalidate style="margin:0">
+    <h2>Datos públicos</h2>
+    <%- include('../partials/csrf') %>
+    <%- include('../partials/field', { name: 'name', label: 'Nombre artístico', value: values.name, error: errors.name, attrs: 'required' }) %>
+    <%- include('../partials/field', { name: 'slug', label: 'Dirección de tu perfil', value: values.slug, error: errors.slug, hint: 'Aparece en la dirección /a/… Solo letras, números y guiones.', attrs: 'maxlength="40"' }) %>
+    <%- include('../partials/field', { name: 'bio', label: 'Biografía', type: 'textarea', value: values.bio, error: errors.bio, attrs: 'maxlength="1000"' }) %>
+    <button class="button" type="submit">Guardar perfil</button>
+  </form>
+  <form class="panel" method="post" action="/studio/password" novalidate style="margin:0">
+    <h2>Cambiar contraseña</h2>
+    <p class="small muted">Al cambiarla se cierra tu sesión en los demás dispositivos.</p>
+    <%- include('../partials/csrf') %>
+    <%- include('../partials/field', { name: 'current', label: 'Contraseña actual', type: 'password', value: '', error: pwErrors.current, attrs: 'autocomplete="current-password" required' }) %>
+    <%- include('../partials/field', { name: 'password', label: 'Contraseña nueva', type: 'password', value: '', error: pwErrors.password, hint: 'Mínimo 10 caracteres.', attrs: 'autocomplete="new-password" required' }) %>
+    <%- include('../partials/field', { name: 'confirm', label: 'Repite la contraseña nueva', type: 'password', value: '', error: pwErrors.confirm, attrs: 'autocomplete="new-password" required' }) %>
+    <button class="button" type="submit">Cambiar contraseña</button>
+  </form>
+</div>
+<%- include('../partials/foot') %>

@@ -1,0 +1,49 @@
+<%- include('../partials/head') %>
+<% const featured = recent[0]; %>
+<section class="hero">
+  <div>
+    <h1>Obras que responden a la cámara</h1>
+    <p>Sube una obra, añádele un video, una audioguía o un modelo 3D y comparte su código QR. Quien apunte el celular a la obra verá ese contenido aparecer encima.</p>
+    <div class="actions">
+      <% if (user) { %>
+        <a class="button large" href="/studio/works/new">Subir una obra</a>
+        <a class="button secondary large" href="/studio">Ir a mis obras</a>
+      <% } else if (allowRegistration) { %>
+        <a class="button large" href="/register">Crear cuenta de artista</a>
+        <a class="button secondary large" href="/login">Iniciar sesión</a>
+      <% } else { %>
+        <a class="button large" href="/login">Iniciar sesión</a>
+      <% } %>
+    </div>
+  </div>
+  <figure class="hero-figure" style="margin:0">
+    <% if (featured) { %>
+      <a class="viewfinder" href="/v/<%= featured.work.shareToken %>" style="display:block">
+        <img src="<%= media(featured.work.targetImageKey) %>" alt="<%= featured.work.title %>, de <%= featured.artist.name %>">
+      </a>
+      <figcaption><%= featured.work.title %> — <%= featured.artist.name %></figcaption>
+    <% } else { %>
+      <div class="viewfinder"><div class="placeholder-canvas" role="img" aria-label="Lienzo de ejemplo"></div></div>
+      <figcaption>Aquí aparecerá la obra publicada más reciente</figcaption>
+    <% } %>
+  </figure>
+</section>
+
+<section aria-labelledby="recientes">
+  <div class="section-head">
+    <h2 id="recientes">Obras recientes</h2>
+  </div>
+  <% if (recent.length) { %>
+    <ul class="works-grid">
+      <% recent.forEach(({ work, artist }) => { %>
+        <li><%- include('../partials/work-card', { work, href: `/v/${work.shareToken}`, subtitle: artist.name }) %></li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <div class="empty">
+      <h3>Todavía no hay obras publicadas</h3>
+      <p class="muted">Las obras aparecen aquí cuando sus artistas las publican desde su estudio.</p>
+    </div>
+  <% } %>
+</section>
+<%- include('../partials/foot') %>

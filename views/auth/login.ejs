@@ -1,0 +1,19 @@
+<%- include('../partials/head') %>
+<div class="narrow">
+  <div class="auth-intro">
+    <h1>Iniciar sesión</h1>
+    <p class="muted">Entra para gestionar tus obras y sus experiencias de realidad aumentada.</p>
+  </div>
+  <form class="panel" method="post" action="/login" novalidate>
+    <% if (errors._) { %><div class="alert error" role="alert"><p><%= errors._ %></p></div><% } %>
+    <%- include('../partials/csrf') %>
+    <input type="hidden" name="next" value="<%= typeof next === 'string' ? next : '' %>">
+    <%- include('../partials/field', { name: 'email', label: 'Correo', type: 'email', value: values.email, attrs: 'autocomplete="email" required autofocus' }) %>
+    <%- include('../partials/field', { name: 'password', label: 'Contraseña', type: 'password', value: '', attrs: 'autocomplete="current-password" required' }) %>
+    <button class="button" type="submit">Iniciar sesión</button>
+  </form>
+  <% if (allowRegistration) { %>
+    <p class="small" style="margin-top:1rem">¿No tienes cuenta? <a href="/register">Crea una cuenta de artista</a>.</p>
+  <% } %>
+</div>
+<%- include('../partials/foot') %>

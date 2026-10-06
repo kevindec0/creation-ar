@@ -1,0 +1,46 @@
+<%# Contenido del panel de una obra, visible sin realidad aumentada. Recibe `assets`. %>
+<% const extras = assets.filter(a => a.role === 'extra');
+   const images = extras.filter(a => a.kind === 'image');
+   const videos = extras.filter(a => a.kind === 'video');
+   const audios = extras.filter(a => a.kind === 'audio');
+   const links = extras.filter(a => a.kind === 'link'); %>
+<% if (audios.length) { %>
+  <section class="panel">
+    <h2>Escuchar</h2>
+    <% audios.forEach(a => { %>
+      <% if (a.title) { %><p class="label"><%= a.title %></p><% } %>
+      <audio controls preload="none" src="<%= media(a.storageKey) %>" style="width:100%"></audio>
+    <% }) %>
+  </section>
+<% } %>
+<% if (videos.length) { %>
+  <section class="panel">
+    <h2>Videos</h2>
+    <% videos.forEach(a => { %>
+      <figure style="margin:0 0 1rem">
+        <video controls playsinline preload="metadata" src="<%= media(a.storageKey) %>"></video>
+        <% if (a.title) { %><figcaption class="small muted"><%= a.title %></figcaption><% } %>
+      </figure>
+    <% }) %>
+  </section>
+<% } %>
+<% if (images.length) { %>
+  <section class="panel">
+    <h2>Imágenes</h2>
+    <div class="gallery">
+      <% images.forEach(a => { %>
+        <a href="<%= media(a.storageKey) %>" target="_blank" rel="noopener"><img src="<%= media(a.storageKey) %>" alt="<%= a.title %>" loading="lazy"></a>
+      <% }) %>
+    </div>
+  </section>
+<% } %>
+<% if (links.length) { %>
+  <section class="panel">
+    <h2>Enlaces</h2>
+    <ul class="link-list">
+      <% links.forEach(a => { %>
+        <li><a href="<%= a.url %>" target="_blank" rel="noopener noreferrer"><%= a.title %></a></li>
+      <% }) %>
+    </ul>
+  </section>
+<% } %>

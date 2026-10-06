@@ -1,0 +1,12 @@
+<%# Uso: include('work-card', { work, href, subtitle?, status?, stats? }) %>
+<a class="work-card" href="<%= href %>">
+  <div class="viewfinder <%= locals.status === 'draft' ? 'is-quiet' : '' %>">
+    <img src="<%= media(work.targetImageKey) %>" alt="" loading="lazy" width="<%= work.targetWidth %>" height="<%= work.targetHeight %>">
+  </div>
+  <h3><%= work.title %></h3>
+  <div class="meta">
+    <% if (locals.subtitle) { %><span><%= subtitle %></span><% } %>
+    <% if (locals.status) { %><span class="status <%= status %>"><%= status === 'published' ? 'Publicada' : 'Borrador' %></span><% } %>
+    <% if (locals.stats) { %><span><%= stats.views %> visitas</span><span><%= stats.scans %> escaneos</span><% } %>
+  </div>
+</a>

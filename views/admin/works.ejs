@@ -1,0 +1,27 @@
+<%- include('../partials/head') %>
+<div class="section-head">
+  <h1>Todas las obras</h1>
+  <a href="/admin">Volver a administración</a>
+</div>
+<% if (rows.length) { %>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th>Obra</th><th>Artista</th><th>Estado</th><th>Visitas</th><th>Escaneos</th><th>Creada</th></tr></thead>
+      <tbody>
+        <% rows.forEach(({ work, artist }) => { const t = totals.get(work.id) || { views: 0, scans: 0 }; %>
+          <tr>
+            <td><a href="/studio/works/<%= work.id %>"><%= work.title %></a></td>
+            <td><a href="/a/<%= artist.slug %>"><%= artist.name %></a></td>
+            <td><span class="status <%= work.status %>"><%= work.status === 'published' ? 'Publicada' : 'Borrador' %></span></td>
+            <td><%= t.views %></td>
+            <td><%= t.scans %></td>
+            <td><%= formatDate(work.createdAt) %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } else { %>
+  <div class="empty"><p class="muted">Todavía nadie ha subido obras.</p></div>
+<% } %>
+<%- include('../partials/foot') %>

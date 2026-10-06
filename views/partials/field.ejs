@@ -1,0 +1,12 @@
+<%# Uso: include('field', { name, label, type, value, error, hint, attrs }) %>
+<% const fid = 'f-' + name; const t = locals.type || 'text'; %>
+<div class="field">
+  <label for="<%= fid %>"><%= label %></label>
+  <% if (locals.hint) { %><p class="hint" id="<%= fid %>-hint"><%= hint %></p><% } %>
+  <% if (t === 'textarea') { %>
+    <textarea id="<%= fid %>" name="<%= name %>" <%- locals.attrs || '' %> <%- locals.error ? 'aria-invalid="true"' : '' %> <%- locals.hint ? `aria-describedby="${fid}-hint"` : '' %>><%= locals.value ?? '' %></textarea>
+  <% } else { %>
+    <input id="<%= fid %>" name="<%= name %>" type="<%= t %>" value="<%= locals.value ?? '' %>" <%- locals.attrs || '' %> <%- locals.error ? 'aria-invalid="true"' : '' %> <%- locals.hint ? `aria-describedby="${fid}-hint"` : '' %>>
+  <% } %>
+  <% if (locals.error) { %><p class="error"><%= error %></p><% } %>
+</div>

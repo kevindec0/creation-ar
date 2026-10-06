@@ -1,0 +1,18 @@
+<%- include('../partials/head') %>
+<div class="narrow">
+  <div class="auth-intro">
+    <h1>Crear cuenta de artista</h1>
+    <p class="muted">Con tu cuenta puedes subir obras, añadirles contenido y compartirlas con un código QR.</p>
+  </div>
+  <form class="panel" method="post" action="/register" novalidate>
+    <% if (errors._) { %><div class="alert error" role="alert"><p><%= errors._ %></p></div><% } %>
+    <%- include('../partials/csrf') %>
+    <%- include('../partials/field', { name: 'name', label: 'Nombre artístico', value: values.name, error: errors.name, hint: 'Así aparecerás en tus obras y en tu perfil público.', attrs: 'autocomplete="name" required' }) %>
+    <%- include('../partials/field', { name: 'email', label: 'Correo', type: 'email', value: values.email, error: errors.email, attrs: 'autocomplete="email" required' }) %>
+    <%- include('../partials/field', { name: 'password', label: 'Contraseña', type: 'password', value: '', error: errors.password, hint: 'Mínimo 10 caracteres.', attrs: 'autocomplete="new-password" required minlength="10"' }) %>
+    <%- include('../partials/field', { name: 'confirm', label: 'Repite la contraseña', type: 'password', value: '', error: errors.confirm, attrs: 'autocomplete="new-password" required' }) %>
+    <button class="button" type="submit">Crear cuenta</button>
+  </form>
+  <p class="small" style="margin-top:1rem">¿Ya tienes cuenta? <a href="/login">Inicia sesión</a>.</p>
+</div>
+<%- include('../partials/foot') %>

@@ -1,0 +1,19 @@
+<%- include('../partials/head') %>
+<div class="section-head">
+  <h1>Mis obras</h1>
+  <a class="button" href="/studio/works/new">Nueva obra</a>
+</div>
+<% if (items.length) { %>
+  <ul class="works-grid">
+    <% items.forEach(work => { %>
+      <li><%- include('../partials/work-card', { work, href: `/studio/works/${work.id}`, status: work.status, stats: totals.get(work.id) || { views: 0, scans: 0 } }) %></li>
+    <% }) %>
+  </ul>
+<% } else { %>
+  <div class="empty">
+    <h2>Sube tu primera obra</h2>
+    <p class="muted">Necesitas una foto de la obra, tomada de frente y con buena luz. A partir de ella la cámara aprenderá a reconocerla.</p>
+    <a class="button large" href="/studio/works/new">Subir una obra</a>
+  </div>
+<% } %>
+<%- include('../partials/foot') %>

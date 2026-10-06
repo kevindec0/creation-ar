@@ -1,0 +1,19 @@
+<%- include('../partials/head') %>
+<div class="work-layout">
+  <aside class="work-aside">
+    <div class="viewfinder">
+      <img src="<%= media(work.targetImageKey) %>" alt="<%= work.title %>" width="<%= work.targetWidth %>" height="<%= work.targetHeight %>">
+    </div>
+  </aside>
+  <div>
+    <h1><%= work.title %></h1>
+    <p>De <a href="/a/<%= artist.slug %>"><%= artist.name %></a><% if (work.technique || work.year) { %><span class="muted">, <%= [work.technique, work.year].filter(Boolean).join(', ') %></span><% } %></p>
+    <div class="ar-cta">
+      <a class="button large" href="/v/<%= work.shareToken %>/ar">Ver en realidad aumentada</a>
+      <p>Se abrirá la cámara. Apunta a la obra original o a su imagen en otra pantalla.</p>
+    </div>
+    <% if (work.description) { %><p style="white-space:pre-line"><%= work.description %></p><% } %>
+    <%- include('../partials/extras') %>
+  </div>
+</div>
+<%- include('../partials/foot') %>

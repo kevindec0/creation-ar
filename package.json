@@ -1,0 +1,58 @@
+{
+  "name": "creation-ar",
+  "version": "2.0.0",
+  "description": "Obras de arte con experiencias de realidad aumentada en el navegador",
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=.env src/local.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node --env-file-if-exists=.env dist/local.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx --env-file-if-exists=.env scripts/migrate.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "vendor:blob": "esbuild scripts/blob-client-entry.js --bundle --format=esm --platform=browser --minify --outfile=public/static/vendor/vercel-blob/client.js --define:process.env.NODE_ENV=\\\"production\\\" --define:process.env={} --banner:js=\"/* @vercel/blob/client (Apache-2.0), empaquetado con esbuild */\""
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
+    "@types/ejs": "^3.1.5",
+    "@types/express": "^5.0.6",
+    "@types/multer": "^2.3.0",
+    "@types/node": "^26.6.4",
+    "@types/pg": "^8.23.1",
+    "@types/qrcode": "^1.5.6",
+    "@types/supertest": "^7.2.1",
+    "drizzle-kit": "^0.31.11",
+    "esbuild": "^0.28.2",
+    "pino-pretty": "^13.2.0",
+    "supertest": "^7.3.1",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vercel": "^62.5.0",
+    "vitest": "^5.0.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1146.0",
+    "@electric-sql/pglite": "^0.5.8",
+    "@node-rs/argon2": "^2.2.2",
+    "@vercel/blob": "^2.8.1",
+    "cookie-parser": "^1.4.7",
+    "drizzle-orm": "^0.45.3",
+    "ejs": "^7.0.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.1",
+    "file-type": "^22.1.1",
+    "helmet": "^8.3.0",
+    "multer": "^2.4.0",
+    "pg": "^8.23.1",
+    "pino": "^10.4.0",
+    "pino-http": "^11.0.0",
+    "qrcode": "^1.5.4",
+    "zod": "^4.6.5"
+  },
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22.9 <25"
+  }
+}

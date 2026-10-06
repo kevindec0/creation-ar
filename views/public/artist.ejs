@@ -1,0 +1,15 @@
+<%- include('../partials/head') %>
+<header style="margin-bottom:2.5rem">
+  <h1><%= artist.name %></h1>
+  <% if (artist.bio) { %><p class="muted" style="white-space:pre-line"><%= artist.bio %></p><% } %>
+</header>
+<% if (items.length) { %>
+  <ul class="works-grid">
+    <% items.forEach(({ work }) => { %>
+      <li><%- include('../partials/work-card', { work, href: `/v/${work.shareToken}`, subtitle: [work.technique, work.year].filter(Boolean).join(', ') }) %></li>
+    <% }) %>
+  </ul>
+<% } else { %>
+  <div class="empty"><p class="muted">Este perfil todavía no tiene obras publicadas.</p></div>
+<% } %>
+<%- include('../partials/foot') %>

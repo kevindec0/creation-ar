@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title ? `${title} · CreationAR` : 'CreationAR · Arte con realidad aumentada' %></title>
+  <meta name="description" content="Obras de arte que muestran videos, audio y modelos 3D al apuntarles con la cámara del celular.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta name="csrf-token" content="<%= csrfToken %>">
+  <% if (user) { %><meta name="upload-mode" content="<%= uploadMode %>" data-user-id="<%= user.id %>" data-max-mb="<%= maxMb %>"><% } %>
+  <link rel="preload" href="/static/fonts/bricolage-grotesque-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+  <a class="visually-hidden" href="#contenido">Ir al contenido</a>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/"><span class="brand-mark viewfinder" aria-hidden="true"></span>CreationAR</a>
+      <nav class="site-nav" aria-label="Principal">
+        <a href="/" <%- path === '/' ? 'aria-current="page"' : '' %>>Galería</a>
+        <% if (user) { %>
+          <a href="/studio" <%- path.startsWith('/studio') && path !== '/studio/profile' ? 'aria-current="page"' : '' %>>Mis obras</a>
+          <% if (user.role === 'admin') { %>
+            <a href="/admin" <%- path.startsWith('/admin') ? 'aria-current="page"' : '' %>>Administración</a>
+          <% } %>
+          <a href="/studio/profile" <%- path === '/studio/profile' ? 'aria-current="page"' : '' %>>Perfil</a>
+          <form method="post" action="/logout">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="link-button" type="submit">Salir</button>
+          </form>
+        <% } else { %>
+          <a href="/login" <%- path === '/login' ? 'aria-current="page"' : '' %>>Iniciar sesión</a>
+          <% if (allowRegistration) { %><a class="button secondary" href="/register">Crear cuenta</a><% } %>
+        <% } %>
+      </nav>
+    </div>
+  </header>
+  <main id="contenido">
+    <div class="wrap">
+      <% if (typeof flash !== 'undefined' && flash) { %>
+        <div class="alert <%= flash.type === 'error' ? 'error' : 'success' %>" role="<%= flash.type === 'error' ? 'alert' : 'status' %>">
+          <p><%= flash.text %></p>
+        </div>
+      <% } %>

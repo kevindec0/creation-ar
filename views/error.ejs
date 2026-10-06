@@ -1,0 +1,11 @@
+<%- include('partials/head') %>
+<section class="error-page">
+  <p class="code"><%= status %></p>
+  <h1><%= status === 404 ? 'No encontramos esta página' : status === 403 ? 'Acceso restringido' : 'No se pudo completar la acción' %></h1>
+  <p><%= message %></p>
+  <div class="actions" style="justify-content:center">
+    <button class="button secondary" type="button" data-back>Volver</button>
+    <a class="button" href="/">Ir a la galería</a>
+  </div>
+</section>
+<%- include('partials/foot') %>
